@@ -1,13 +1,19 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity >=0.8.25 <0.9.0;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.25;
 
-import { Foo } from "../src/Foo.sol";
+import { Script } from "forge-std/src/Script.sol";
+import { BlockEstateFactory } from "../src/BlockEstateFactory.sol";
 
-import { BaseScript } from "./Base.s.sol";
+contract Deploy is Script {
+    function run() external returns (BlockEstateFactory) {
+        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-/// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
-contract Deploy is BaseScript {
-    function run() public broadcast returns (Foo foo) {
-        foo = new Foo();
+        vm.startBroadcast(deployerPrivateKey);
+
+        BlockEstateFactory factory = new BlockEstateFactory();
+
+        vm.stopBroadcast();
+
+        return factory;
     }
 }
