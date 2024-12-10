@@ -71,10 +71,11 @@ contract BaseTest is Test, Default {
         supplies[2] = SUPPLY_3;
 
         vm.startPrank(SELLER);
-        address estateAddress =
-            factory.tokenizeProperty(DEFAULT_URI, address(quoteToken), ids, prices, supplies, block.timestamp + ONE_DAY);
+        BlockEstate newEstate = BlockEstate(
+            factory.tokenizeProperty(DEFAULT_URI, address(quoteToken), ids, prices, supplies, block.timestamp + ONE_DAY)
+        );
         vm.stopPrank();
-        return BlockEstate(estateAddress);
+        return newEstate;
     }
 
     /**

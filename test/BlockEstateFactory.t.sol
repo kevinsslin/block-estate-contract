@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
+/* solhint-disable var-name-mixedcase */
 pragma solidity 0.8.25;
 
 import { BaseTest } from "./Base.t.sol";
 import { BlockEstate } from "../src/BlockEstate.sol";
-import { IBlockEstateFactory } from "../src/interfaces/IBlockEstateFactory.sol";
 import { Errors } from "../src/libraries/Error.sol";
 
 contract BlockEstateFactoryTest is BaseTest {
@@ -55,8 +55,8 @@ contract BlockEstateFactoryTest is BaseTest {
         assertEq(factory.getBlockEstates().length, 1);
 
         BlockEstate estate = BlockEstate(estateAddress);
-        assertEq(estate.quoteAsset(), address(quoteToken));
-        assertEq(estate.startTimestamp(), startTime);
+        assertEq(estate.QUOTE_ASSET(), address(quoteToken));
+        assertEq(estate.START_TIMESTAMP(), startTime);
         assertEq(estate.seller(), SELLER);
 
         vm.stopPrank();

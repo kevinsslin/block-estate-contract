@@ -13,8 +13,8 @@ import { Errors } from "./libraries/Error.sol";
 contract BlockEstateFactory is IBlockEstateFactory, Ownable {
     // State Variables
     address[] public deployedEstates;
-    mapping(address => bool) public isValidEstate;
-    mapping(address => bool) public isWhitelistedSeller;
+    mapping(address estate => bool isValid) public isValidEstate;
+    mapping(address seller => bool isWhitelisted) public isWhitelistedSeller;
 
     /**
      * @dev Constructor that sets up the owner

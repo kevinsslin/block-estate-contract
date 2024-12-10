@@ -24,22 +24,22 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
     string public metadataUri;
 
     /// @notice Token used for pricing and payments
-    address public immutable quoteAsset;
+    address public immutable QUOTE_ASSET;
 
     /// @notice Mapping of token ID to its price
-    mapping(uint256 => uint256) public tokenPrices;
+    mapping(uint256 tokenId => uint256 price) public tokenPrices;
 
     /// @notice Mapping of token ID to its maximum supply
-    mapping(uint256 => uint256) public maxSupply;
+    mapping(uint256 tokenId => uint256 supply) public maxSupply;
 
     /// @notice Timestamp when token trading starts
-    uint256 public immutable startTimestamp;
+    uint256 public immutable START_TIMESTAMP;
 
     /// @notice Mapping of token ID to total funds distributed
-    mapping(uint256 => uint256) public totalDistributed;
+    mapping(uint256 tokenId => uint256 amount) public totalDistributed;
 
     /// @notice Mapping of token ID to current total supply
-    mapping(uint256 => uint256) private _totalSupply;
+    mapping(uint256 tokenId => uint256 supply) private _totalSupply;
 
     /// @notice Address of the property seller
     address public seller;
@@ -89,8 +89,8 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
         if (seller_ == address(0)) revert Errors.ZeroAddress();
 
         metadataUri = metadataUri_;
-        quoteAsset = quoteAsset_;
-        startTimestamp = startTimestamp_;
+        QUOTE_ASSET = quoteAsset_;
+        START_TIMESTAMP = startTimestamp_;
         seller = seller_;
 
         for (uint256 i = 0; i < ids_.length; i++) {
@@ -125,16 +125,16 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
      * @param amount Amount of tokens to mint
      */
     function mint(address to, uint256 id, uint256 amount) external payable nonReentrant {
-        if (block.timestamp < startTimestamp) revert Errors.TradingNotStarted();
+        if (block.timestamp < START_TIMESTAMP) revert Errors.TradingNotStarted();
         if (amount == 0) revert Errors.InvalidAmount();
         if (_totalSupply[id] + amount > maxSupply[id]) revert Errors.ExceedsMaxSupply();
 
         uint256 totalPrice = amount * tokenPrices[id];
-        if (quoteAsset == address(0)) {
+        if (QUOTE_ASSET == address(0)) {
             if (msg.value != totalPrice) revert Errors.InvalidETHAmount();
         } else {
             if (msg.value != 0) revert Errors.ETHNotAccepted();
-            IERC20(quoteAsset).safeTransferFrom(msg.sender, address(this), totalPrice);
+            IERC20(QUOTE_ASSET).safeTransferFrom(msg.sender, address(this), totalPrice);
         }
 
         _totalSupply[id] += amount;
@@ -169,7 +169,7 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
         uint256 totalSupply_ = totalSupply(id);
         if (totalSupply_ == 0) revert Errors.NoTokensExist();
 
-        IERC20(quoteAsset).safeTransferFrom(msg.sender, address(this), amount);
+        IERC20(QUOTE_ASSET).safeTransferFrom(msg.sender, address(this), amount);
 
         uint256 perTokenAmount = amount / totalSupply_;
         totalDistributed[id] += amount;
@@ -196,5 +196,21 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
      */
     function uri(uint256) public view virtual override(ERC1155, IBlockEstate) returns (string memory) {
         return metadataUri;
+    }
+
+    /**
+     * @notice Gets the quote asset address
+     * @return Address of the quote asset
+     */
+    function quoteAsset() external view override returns (address) {
+        return QUOTE_ASSET;
+    }
+
+    /**
+     * @notice Gets the start timestamp
+     * @return Timestamp when token trading starts
+     */
+    function startTimestamp() external view override returns (uint256) {
+        return START_TIMESTAMP;
     }
 }

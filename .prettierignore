@@ -1,12 +1,26 @@
-# directories
+# Dependencies
+node_modules
+lib
+out
+
+# Build output
 broadcast
 cache
+artifacts
+
+# Coverage
 coverage
 node_modules
 out
 
-# files
-*.env
+# Env files
+.env*
+
+# IDE
+.vscode
+.idea
+
+# Misc
 *.log
 .DS_Store
 .pnp.*
