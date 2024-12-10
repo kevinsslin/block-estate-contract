@@ -6,20 +6,6 @@ pragma solidity 0.8.25;
  * @dev Interface for the BlockEstate token contract
  */
 interface IBlockEstate {
-    // Custom Errors
-    error TradingNotStarted();
-    error ExceedsMaxSupply();
-    error NotAuthorized();
-    error NotSeller();
-    error InvalidAmount();
-    error InvalidETHAmount();
-    error ETHNotAccepted();
-    error NoTokensExist();
-    error InvalidQuoteAsset();
-    error InvalidStartTimestamp();
-    error InvalidArrayLengths();
-    error ZeroAddress();
-
     // Events
     event TokensMinted(address indexed to, uint256 indexed id, uint256 amount);
     event TokensBurned(address indexed from, uint256 indexed id, uint256 amount);

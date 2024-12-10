@@ -4,6 +4,7 @@ pragma solidity 0.8.25;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { BlockEstate } from "./BlockEstate.sol";
 import { IBlockEstateFactory } from "./interfaces/IBlockEstateFactory.sol";
+import { Errors } from "./libraries/Error.sol";
 
 /**
  * @title BlockEstateFactory
@@ -24,7 +25,7 @@ contract BlockEstateFactory is IBlockEstateFactory, Ownable {
      * @dev Modifier to check if sender is whitelisted seller
      */
     modifier onlyWhitelistedSeller() {
-        if (!isWhitelistedSeller[msg.sender]) revert NotWhitelistedSeller();
+        if (!isWhitelistedSeller[msg.sender]) revert Errors.NotWhitelistedSeller();
         _;
     }
 
@@ -34,7 +35,7 @@ contract BlockEstateFactory is IBlockEstateFactory, Ownable {
      * @param status Whitelist status to set
      */
     function setSeller(address seller, bool status) external onlyOwner {
-        if (seller == address(0)) revert ZeroAddress();
+        if (seller == address(0)) revert Errors.ZeroAddress();
         isWhitelistedSeller[seller] = status;
         emit SellerWhitelisted(seller, status);
     }
@@ -61,13 +62,13 @@ contract BlockEstateFactory is IBlockEstateFactory, Ownable {
         returns (address)
     {
         if (ids.length != prices.length || prices.length != supplyAmounts.length) {
-            revert InvalidArrayLengths();
+            revert Errors.InvalidArrayLengths();
         }
         if (startTimestamp <= block.timestamp) {
-            revert InvalidStartTimestamp();
+            revert Errors.InvalidStartTimestamp();
         }
         if (quoteAsset == address(0)) {
-            revert InvalidQuoteAsset();
+            revert Errors.InvalidQuoteAsset();
         }
 
         BlockEstate newEstate = new BlockEstate(

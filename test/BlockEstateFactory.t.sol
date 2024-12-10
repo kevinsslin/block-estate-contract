@@ -4,6 +4,7 @@ pragma solidity 0.8.25;
 import { BaseTest } from "./Base.t.sol";
 import { BlockEstate } from "../src/BlockEstate.sol";
 import { IBlockEstateFactory } from "../src/interfaces/IBlockEstateFactory.sol";
+import { Errors } from "../src/libraries/Error.sol";
 
 contract BlockEstateFactoryTest is BaseTest {
     function test_WhitelistSeller() public {
@@ -23,11 +24,8 @@ contract BlockEstateFactoryTest is BaseTest {
 
     function test_OnlyOwnerCanWhitelist() public {
         vm.startPrank(USER1);
-
-        // Should revert when non-owner tries to whitelist
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(abi.encodeWithSelector(Errors.OwnableUnauthorizedAccount.selector, USER1));
         factory.setSeller(USER2, true);
-
         vm.stopPrank();
     }
 
@@ -82,7 +80,7 @@ contract BlockEstateFactoryTest is BaseTest {
         supplies[1] = SUPPLY_2;
         supplies[2] = SUPPLY_3;
 
-        vm.expectRevert(IBlockEstateFactory.NotWhitelistedSeller.selector);
+        vm.expectRevert(Errors.NotWhitelistedSeller.selector);
         factory.tokenizeProperty(DEFAULT_URI, address(quoteToken), ids, prices, supplies, block.timestamp + ONE_DAY);
 
         vm.stopPrank();
@@ -104,7 +102,7 @@ contract BlockEstateFactoryTest is BaseTest {
         supplies[1] = SUPPLY_2;
         supplies[2] = SUPPLY_3;
 
-        vm.expectRevert(IBlockEstateFactory.InvalidArrayLengths.selector);
+        vm.expectRevert(Errors.InvalidArrayLengths.selector);
         factory.tokenizeProperty(
             DEFAULT_URI, address(quoteToken), ids, invalidPrices, supplies, block.timestamp + ONE_DAY
         );
@@ -130,7 +128,7 @@ contract BlockEstateFactoryTest is BaseTest {
         supplies[1] = SUPPLY_2;
         supplies[2] = SUPPLY_3;
 
-        vm.expectRevert(IBlockEstateFactory.InvalidStartTimestamp.selector);
+        vm.expectRevert(Errors.InvalidStartTimestamp.selector);
         factory.tokenizeProperty(
             DEFAULT_URI,
             address(quoteToken),
@@ -161,7 +159,7 @@ contract BlockEstateFactoryTest is BaseTest {
         supplies[1] = SUPPLY_2;
         supplies[2] = SUPPLY_3;
 
-        vm.expectRevert(IBlockEstateFactory.InvalidQuoteAsset.selector);
+        vm.expectRevert(Errors.InvalidQuoteAsset.selector);
         factory.tokenizeProperty(
             DEFAULT_URI,
             address(0), // Zero address is invalid

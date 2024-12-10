@@ -6,13 +6,6 @@ pragma solidity 0.8.25;
  * @dev Interface for the BlockEstate factory contract
  */
 interface IBlockEstateFactory {
-    // Custom Errors
-    error NotWhitelistedSeller();
-    error InvalidArrayLengths();
-    error InvalidStartTimestamp();
-    error InvalidQuoteAsset();
-    error ZeroAddress();
-
     // Events
     event PropertyTokenized(
         address indexed estate,

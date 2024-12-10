@@ -6,6 +6,7 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.s
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { IBlockEstate } from "./interfaces/IBlockEstate.sol";
+import { Errors } from "./libraries/Error.sol";
 
 /**
  * @title BlockEstate
@@ -37,6 +38,9 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
     /// @notice Mapping of token ID to total funds distributed
     mapping(uint256 => uint256) public totalDistributed;
 
+    /// @notice Mapping of token ID to current total supply
+    mapping(uint256 => uint256) private _totalSupply;
+
     /// @notice Address of the property seller
     address public seller;
 
@@ -48,7 +52,7 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
      * @notice Ensures caller is the seller
      */
     modifier onlySeller() {
-        if (msg.sender != seller) revert NotSeller();
+        if (msg.sender != seller) revert Errors.NotSeller();
         _;
     }
 
@@ -77,12 +81,12 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
     )
         ERC1155(metadataUri_)
     {
-        if (quoteAsset_ == address(0)) revert InvalidQuoteAsset();
-        if (startTimestamp_ <= block.timestamp) revert InvalidStartTimestamp();
+        if (quoteAsset_ == address(0)) revert Errors.InvalidQuoteAsset();
+        if (startTimestamp_ <= block.timestamp) revert Errors.InvalidStartTimestamp();
         if (ids_.length != prices_.length || prices_.length != supplyAmounts_.length) {
-            revert InvalidArrayLengths();
+            revert Errors.InvalidArrayLengths();
         }
-        if (seller_ == address(0)) revert ZeroAddress();
+        if (seller_ == address(0)) revert Errors.ZeroAddress();
 
         metadataUri = metadataUri_;
         quoteAsset = quoteAsset_;
@@ -90,10 +94,11 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
         seller = seller_;
 
         for (uint256 i = 0; i < ids_.length; i++) {
-            if (prices_[i] == 0) revert InvalidAmount();
-            if (supplyAmounts_[i] == 0) revert InvalidAmount();
+            if (prices_[i] == 0) revert Errors.InvalidAmount();
+            if (supplyAmounts_[i] == 0) revert Errors.InvalidAmount();
             tokenPrices[ids_[i]] = prices_[i];
             maxSupply[ids_[i]] = supplyAmounts_[i];
+            _totalSupply[ids_[i]] = 0;
         }
 
         emit SellerUpdated(seller_);
@@ -108,7 +113,7 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
      * @param newSeller New seller address
      */
     function setSeller(address newSeller) external onlySeller {
-        if (newSeller == address(0)) revert ZeroAddress();
+        if (newSeller == address(0)) revert Errors.ZeroAddress();
         seller = newSeller;
         emit SellerUpdated(newSeller);
     }
@@ -120,18 +125,19 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
      * @param amount Amount of tokens to mint
      */
     function mint(address to, uint256 id, uint256 amount) external payable nonReentrant {
-        if (block.timestamp < startTimestamp) revert TradingNotStarted();
-        if (amount == 0) revert InvalidAmount();
-        if (totalSupply(id) + amount > maxSupply[id]) revert ExceedsMaxSupply();
+        if (block.timestamp < startTimestamp) revert Errors.TradingNotStarted();
+        if (amount == 0) revert Errors.InvalidAmount();
+        if (_totalSupply[id] + amount > maxSupply[id]) revert Errors.ExceedsMaxSupply();
 
         uint256 totalPrice = amount * tokenPrices[id];
         if (quoteAsset == address(0)) {
-            if (msg.value != totalPrice) revert InvalidETHAmount();
+            if (msg.value != totalPrice) revert Errors.InvalidETHAmount();
         } else {
-            if (msg.value != 0) revert ETHNotAccepted();
+            if (msg.value != 0) revert Errors.ETHNotAccepted();
             IERC20(quoteAsset).safeTransferFrom(msg.sender, address(this), totalPrice);
         }
 
+        _totalSupply[id] += amount;
         _mint(to, id, amount, "");
         emit TokensMinted(to, id, amount);
     }
@@ -143,11 +149,12 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
      * @param amount Amount of tokens to burn
      */
     function burn(address from, uint256 id, uint256 amount) external nonReentrant {
-        if (amount == 0) revert InvalidAmount();
+        if (amount == 0) revert Errors.InvalidAmount();
         if (from != msg.sender && !isApprovedForAll(from, msg.sender)) {
-            revert NotAuthorized();
+            revert Errors.NotAuthorized();
         }
 
+        _totalSupply[id] -= amount;
         _burn(from, id, amount);
         emit TokensBurned(from, id, amount);
     }
@@ -158,9 +165,9 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
      * @param amount Amount of funds to distribute
      */
     function distributeFunds(uint256 id, uint256 amount) external nonReentrant onlySeller {
-        if (amount == 0) revert InvalidAmount();
+        if (amount == 0) revert Errors.InvalidAmount();
         uint256 totalSupply_ = totalSupply(id);
-        if (totalSupply_ == 0) revert NoTokensExist();
+        if (totalSupply_ == 0) revert Errors.NoTokensExist();
 
         IERC20(quoteAsset).safeTransferFrom(msg.sender, address(this), amount);
 
@@ -180,7 +187,7 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
      * @return Current total supply
      */
     function totalSupply(uint256 id) public view returns (uint256) {
-        return maxSupply[id] - balanceOf(address(this), id);
+        return _totalSupply[id];
     }
 
     /**

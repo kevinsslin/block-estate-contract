@@ -3,9 +3,9 @@ pragma solidity 0.8.25;
 
 import { BaseTest } from "./Base.t.sol";
 import { BlockEstate } from "../src/BlockEstate.sol";
-import { Error } from "./utils/Error.sol";
+import { Errors } from "../src/libraries/Error.sol";
 
-contract BlockEstateTest is BaseTest, Error {
+contract BlockEstateTest is BaseTest {
     BlockEstate public estate;
 
     function setUp() public override {
@@ -31,7 +31,7 @@ contract BlockEstateTest is BaseTest, Error {
 
         vm.startPrank(USER1);
         quoteToken.approve(address(estate), amount * estate.tokenPrices(ID_1));
-        vm.expectRevert(Error.TradingNotStarted.selector);
+        vm.expectRevert(Errors.TradingNotStarted.selector);
         estate.mint(USER1, ID_1, amount);
         vm.stopPrank();
     }
@@ -42,7 +42,7 @@ contract BlockEstateTest is BaseTest, Error {
 
         vm.startPrank(USER1);
         quoteToken.approve(address(estate), amount * estate.tokenPrices(ID_1));
-        vm.expectRevert(Error.ExceedsMaxSupply.selector);
+        vm.expectRevert(Errors.ExceedsMaxSupply.selector);
         estate.mint(USER1, ID_1, amount);
         vm.stopPrank();
     }
@@ -73,7 +73,7 @@ contract BlockEstateTest is BaseTest, Error {
         vm.stopPrank();
 
         vm.startPrank(USER2);
-        vm.expectRevert(Error.NotAuthorized.selector);
+        vm.expectRevert(Errors.NotAuthorized.selector);
         estate.burn(USER1, ID_1, amount);
         vm.stopPrank();
     }
@@ -114,7 +114,7 @@ contract BlockEstateTest is BaseTest, Error {
         // Try to distribute funds from non-seller
         vm.startPrank(USER2);
         quoteToken.approve(address(estate), distribution);
-        vm.expectRevert(Error.NotSeller.selector);
+        vm.expectRevert(Errors.NotSeller.selector);
         estate.distributeFunds(ID_1, distribution);
         vm.stopPrank();
     }
@@ -129,7 +129,7 @@ contract BlockEstateTest is BaseTest, Error {
 
     function test_SetSellerUnauthorized() public {
         vm.startPrank(USER1);
-        vm.expectRevert(Error.NotSeller.selector);
+        vm.expectRevert(Errors.NotSeller.selector);
         estate.setSeller(USER2);
         vm.stopPrank();
     }

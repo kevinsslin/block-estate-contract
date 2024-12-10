@@ -48,6 +48,7 @@ contract BaseTest is Test, Default {
         vm.deal(USER2, INITIAL_ETH_BALANCE);
         deal(address(quoteToken), USER1, INITIAL_TOKEN_BALANCE);
         deal(address(quoteToken), USER2, INITIAL_TOKEN_BALANCE);
+        deal(address(quoteToken), SELLER, INITIAL_TOKEN_BALANCE);
     }
 
     /**
@@ -85,6 +86,10 @@ contract BaseTest is Test, Default {
         vm.stopPrank();
 
         vm.startPrank(USER2);
+        quoteToken.approve(spender, amount);
+        vm.stopPrank();
+
+        vm.startPrank(SELLER);
         quoteToken.approve(spender, amount);
         vm.stopPrank();
     }
