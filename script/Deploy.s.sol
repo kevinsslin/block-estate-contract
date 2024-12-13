@@ -10,8 +10,11 @@ contract Deploy is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 
-        BlockEstateFactory factory = new BlockEstateFactory();
+        address deployer = vm.addr(deployerPrivateKey);
+        BlockEstateFactory factory = new BlockEstateFactory(deployer);
         console.log("Factory deployed at:", address(factory));
+
+        factory.setSeller(deployer, true);
 
         vm.stopBroadcast();
         return factory;

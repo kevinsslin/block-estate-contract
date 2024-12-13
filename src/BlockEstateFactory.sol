@@ -19,7 +19,7 @@ contract BlockEstateFactory is IBlockEstateFactory, Ownable {
     /**
      * @dev Constructor that sets up the owner
      */
-    constructor() Ownable(msg.sender) { }
+    constructor(address owner) Ownable(owner) { }
 
     /**
      * @dev Modifier to check if sender is whitelisted seller
