@@ -44,6 +44,9 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
     /// @notice Address of the property seller
     address public seller;
 
+    /// @notice Array to store all token IDs
+    uint256[] public allTokenIds;
+
     /*//////////////////////////////////////////////////////////////
                                 MODIFIERS
     //////////////////////////////////////////////////////////////*/
@@ -99,6 +102,7 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
             tokenPrices[ids_[i]] = prices_[i];
             maxSupply[ids_[i]] = supplyAmounts_[i];
             _totalSupply[ids_[i]] = 0;
+            allTokenIds.push(ids_[i]); // Store token ID in array
         }
 
         emit SellerUpdated(seller_);
@@ -212,5 +216,13 @@ contract BlockEstate is IBlockEstate, ERC1155, ReentrancyGuard {
      */
     function startTimestamp() external view override returns (uint256) {
         return START_TIMESTAMP;
+    }
+
+    /**
+     * @notice Gets all token IDs
+     * @return Array of all token IDs
+     */
+    function getAllTokenIds() external view returns (uint256[] memory) {
+        return allTokenIds;
     }
 }
