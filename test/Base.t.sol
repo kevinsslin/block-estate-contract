@@ -36,7 +36,7 @@ contract BaseTest is Test, Default {
 
         // Deploy contracts
         vm.startPrank(OWNER);
-        factory = new BlockEstateFactory();
+        factory = new BlockEstateFactory(OWNER);
         factory.setSeller(SELLER, true);
         vm.stopPrank();
 
