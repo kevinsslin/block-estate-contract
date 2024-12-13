@@ -44,7 +44,7 @@ contract SetSeller is Script {
         isWhitelisted = factoryContract.isWhitelistedSeller(seller);
         console.log("\nOperation result:");
         console.log("- Seller whitelisted:", isWhitelisted);
-        
+
         if (isWhitelisted == status) {
             console.log("Operation completed successfully");
         } else {
