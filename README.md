@@ -26,14 +26,14 @@ enables fractional ownership of real estate assets and facilitates fund distribu
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/block-estate.git
+git clone https://github.com/kevinsslin/block-estate.git
 cd block-estate
 ```
 
 2. Install dependencies:
 
 ```bash
-forge install
+bun install
 ```
 
 ## Development
@@ -58,25 +58,50 @@ forge test --gas-report
 
 ## Deployment
 
-1. Copy the environment file:
+The BlockEstate contract has been deployed on the BSC Testnet. You can view the deployed contract at the following address:
+
+- [BlockEstate Contract on BSC Testnet](https://testnet.bscscan.com/address/0x53304a40a8701bd3634bb1a315347cfc9ea31e67)
+
+### Deploying Your Own Instance
+
+If you want to deploy your own instance of the BlockEstate contract, you can use the following command:
 
 ```bash
-cp .env.example .env
+forge script script/Deploy.s.sol:Deploy \
+--rpc-url $RPC_URL \
+--chain 97 \
+--verify \
+--verifier-api-key $API_KEY_BSCSCAN \
+--broadcast
 ```
 
-2. Update `.env` with your configuration:
+
+### Configuration
+
+Before deploying, ensure you have the following environment variables set in your `.env` file:
 
 ```
 PRIVATE_KEY=your_private_key
+API_KEY_BSCSCAN=your_bscscan_api_key
 RPC_URL=your_rpc_url
-ETHERSCAN_API_KEY=your_etherscan_api_key
 ```
 
-3. Deploy to network:
 
-```bash
-forge script script/Deploy.s.sol --rpc-url $RPC_URL --broadcast --verify
-```
+### Steps to Deploy
+
+1. **Set Environment Variables**: Ensure your `.env` file is correctly configured with your private key and BSCScan API key.
+
+2. **Run the Deployment Script**: Use the command provided above to deploy the contract to the BSC Testnet.
+
+3. **Verify the Contract**: The script will automatically verify the contract on BSCScan using your API key.
+
+### Notes
+
+- Ensure you have sufficient BNB in your wallet to cover gas fees for deployment.
+- The `--broadcast` flag will execute the transaction on the network.
+- The `--verify` flag will verify the contract on BSCScan, making the source code publicly available.
+
+For any issues or questions, please refer to the [Foundry documentation](https://book.getfoundry.sh/) or contact the project maintainers.
 
 ## Usage
 
