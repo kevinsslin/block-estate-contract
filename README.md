@@ -60,7 +60,8 @@ forge test --gas-report
 
 The BlockEstate contract has been deployed on the BSC Testnet. You can view the deployed contract at the following address:
 
-- [BlockEstate Contract on BSC Testnet](https://testnet.bscscan.com/address/0x53304a40a8701bd3634bb1a315347cfc9ea31e67)
+- [BlockEstateFactory Contract on BSC Testnet](https://testnet.bscscan.com/address/0x53304a40a8701bd3634bb1a315347cfc9ea31e67)
+- [MockERC20 Contract on BSC Testnet](https://testnet.bscscan.com/address/0xf082c25fcf37da41486f5ba37ccb60dae590b061)
 
 ### Deploying Your Own Instance
 
@@ -75,6 +76,14 @@ forge script script/Deploy.s.sol:Deploy \
 --broadcast
 ```
 
+```bash
+forge script script/DeployMockERC20.s.sol:DeployMockERC20 \
+--rpc-url $RPC_URL \
+--chain 97 \
+--verify \
+--verifier-api-key $API_KEY_BSCSCAN \
+--broadcast
+```
 
 ### Configuration
 
