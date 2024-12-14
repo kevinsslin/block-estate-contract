@@ -107,12 +107,12 @@ contract BlockEstateFactoryTest is BaseTest {
         supplies[2] = SUPPLY_3;
 
         // Create first property
-        address estate1 =
-            factory.tokenizeProperty(DEFAULT_URI, address(quoteToken), ids, prices, supplies, block.timestamp + ONE_DAY);
+        address estate1 = // solhint-disable-next-line max-line-length
+         factory.tokenizeProperty(DEFAULT_URI, address(quoteToken), ids, prices, supplies, block.timestamp + ONE_DAY);
 
         // Create second property
-        address estate2 =
-            factory.tokenizeProperty(DEFAULT_URI, address(quoteToken), ids, prices, supplies, block.timestamp + ONE_DAY);
+        address estate2 = // solhint-disable-next-line max-line-length
+         factory.tokenizeProperty(DEFAULT_URI, address(quoteToken), ids, prices, supplies, block.timestamp + ONE_DAY);
 
         assertTrue(factory.isValidEstate(estate1));
         assertTrue(factory.isValidEstate(estate2));

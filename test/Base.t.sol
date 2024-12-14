@@ -4,7 +4,7 @@ pragma solidity 0.8.25;
 import { Test } from "forge-std/src/Test.sol";
 import { BlockEstateFactory } from "../src/BlockEstateFactory.sol";
 import { BlockEstate } from "../src/BlockEstate.sol";
-import { MockERC20 } from "./mocks/MockERC20.sol";
+import { MockERC20 } from "../src/mocks/MockERC20.sol";
 import { Default } from "./utils/Default.sol";
 
 /**
